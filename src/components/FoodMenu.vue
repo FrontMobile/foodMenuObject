@@ -7,7 +7,7 @@
             <van-col span="4"><div class="item_index">{{index + 1}}</div></van-col>
             <van-col span="12" align="left" style="line-height: 45px;">{{item.name}}</van-col>
             <van-col span="4" style="line-height: 45px;">{{item.likes}}</van-col>
-            <van-col span="4"><van-image class="item_img" :src="item.img"></van-image></van-col>
+            <van-col span="4"><van-image class="item_img" :src="item.img" @click="addLike(index, item.likes)"></van-image></van-col>
           </van-row>
         </van-list>
       </van-pull-refresh>
@@ -23,7 +23,7 @@
 import $ from 'jquery'
 import {
   Button, Icon, PullRefresh, List,
-  Cell, Row, Col, Image
+  Cell, Row, Col, Image, Toast
 } from 'vant'
 import utils from '../assets/script/utils'
 import config from '../assets/script/config'
@@ -39,7 +39,8 @@ export default {
     [PullRefresh.name]: PullRefresh,
     [Row.name]: Row,
     [Col.name]: Col,
-    [Image.name]: Image
+    [Image.name]: Image,
+    [Toast.name]: Toast
   },
   data () {
     return {
@@ -61,7 +62,10 @@ export default {
   },
   methods: {
     share () {
-      alert('share it')
+      Toast.success('请点击浏览器右上角选择分享')
+    },
+    addLike (index, num) {
+      this.$set(this.sites[index], 'likes', parseInt(num) + 1)
     },
     onLoad () {
       console.log('Loding ...')
@@ -72,25 +76,25 @@ export default {
         img: '/static/img/recommend.png',
         name: '红烧茄子',
         description: '这里是菜品介绍',
-        likes: '9999',
+        likes: 9999,
         islike: 'like'
       }, {
         img: '/static/img/unrecommend.png',
         name: '韭菜鸡蛋',
         description: '这里是菜品介绍',
-        likes: '9999',
+        likes: 9999,
         islike: 'like-o'
       }, {
         img: '/static/img/unrecommend.png',
         name: '红烧肉',
         description: '这里是菜品介绍',
-        likes: '9999',
+        likes: 9999,
         islike: 'like-o'
       }, {
         img: '/static/img/unrecommend.png',
         name: '东坡肘子',
         description: '这里是菜品介绍',
-        likes: '9999',
+        likes: 9999,
         islike: 'like-o'
       }, {
         img: '/static/img/unrecommend.png',

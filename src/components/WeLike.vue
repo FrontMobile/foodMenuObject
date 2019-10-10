@@ -71,10 +71,10 @@ export default {
     },
     loadmore (index) {
       Axios.get('http://wx.88q.club:5000/videos?page=' + index).then(res => {
-        console.log(JSON.stringify(res.data))
-        if (res.data.length > 0) {
-          this.data = res.data
+        if (res.data.data.length > 0) {
+          this.data = this.data.concat(res.data.data)
           this.pageNum = index
+          console.log(JSON.stringify(this.data))
         } else {
           Toast.success('NO More')
         }
@@ -99,12 +99,16 @@ export default {
       })
     },
     detail (videoUrl, linkUrl) {
-      let url = videoUrl
-      let showType = 1
-      if (typeof videoUrl === 'undefined' || videoUrl == null || videoUrl === '') {
-        url = linkUrl
-        showType = 2
-      }
+      // let url = videoUrl
+      // let showType = 1
+      // if (typeof videoUrl === 'undefined' || videoUrl == null || videoUrl === '') {
+      //   url = linkUrl
+      //   showType = 2
+      // }
+
+      // 暂时写定
+      let url = linkUrl
+      let showType = 2
       this.$router.push({
         path: '/detail',
         query: {
