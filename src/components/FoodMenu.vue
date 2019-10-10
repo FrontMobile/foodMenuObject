@@ -4,10 +4,17 @@
       <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
         <van-list v-model="isLoading" :finished="isFinished" @load="onLoad" style="margin-top: 5px;">
           <van-row type="flex" justify="space-between" v-for="(item, index) in sites" class="item_class" :key="index">
-            <van-col span="4"><div class="item_index">{{index + 1}}</div></van-col>
+            <van-col span="4">
+              <div class="item_index">{{index + 1}}</div>
+            </van-col>
             <van-col span="12" align="left" style="line-height: 45px;">{{item.name}}</van-col>
             <van-col span="4" style="line-height: 45px;">{{item.likes}}</van-col>
-            <van-col span="4"><van-image class="item_img" :src="item.img" @click="addLike(index, item.likes)"></van-image></van-col>
+            <van-col v-if="item.islike === 'like'" span="4">
+              <van-image class="item_img" src="/static/img/recommend.png" @click="addLike(index, item.likes)"></van-image>
+            </van-col>
+            <van-col v-else span="4">
+              <van-image class="item_img" src="/static/img/unrecommend.png" @click="addLike(index, item.likes)"></van-image>
+            </van-col>
           </van-row>
         </van-list>
       </van-pull-refresh>
@@ -66,6 +73,18 @@ export default {
     },
     addLike (index, num) {
       this.$set(this.sites[index], 'likes', parseInt(num) + 1)
+      this.sites.sort(function (a, b) {
+        let x = a['likes']
+        let y = b['likes']
+        return ((x < y) ? ((x > y) ? 1 : 0) : -1)
+      })
+      console.log(JSON.stringify(this.sites[0]))
+      this.$set(this.sites[0], 'islike', 'like')
+      this.$set(this.sites[1], 'islike', 'like')
+      this.$set(this.sites[2], 'islike', 'like')
+      for (let i = 3; i < this.sites.length; i++) {
+        this.$set(this.sites[i], 'islike', 'like-o')
+      }
     },
     onLoad () {
       console.log('Loding ...')
@@ -83,13 +102,13 @@ export default {
         name: '韭菜鸡蛋',
         description: '这里是菜品介绍',
         likes: 9999,
-        islike: 'like-o'
+        islike: 'like'
       }, {
         img: '/static/img/unrecommend.png',
         name: '红烧肉',
         description: '这里是菜品介绍',
         likes: 9999,
-        islike: 'like-o'
+        islike: 'like'
       }, {
         img: '/static/img/unrecommend.png',
         name: '东坡肘子',
@@ -210,6 +229,7 @@ export default {
     -ms-user-select: none;
     user-select: none;
   }
+
   .item_class {
     width: 90%;
     height: 45px;
@@ -219,11 +239,13 @@ export default {
     background-size: 100% 100%;
     -moz-background-size: 100% 100%;
   }
+
   .item_img {
     height: 30px;
     width: 35px;
     margin-top: 5px;
   }
+
   .item_index {
     background-image: url("/static/img/index_num.png");
     background-repeat: no-repeat;
