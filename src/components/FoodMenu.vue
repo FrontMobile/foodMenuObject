@@ -1,19 +1,23 @@
 <template>
   <div id="app" align="center">
+    <van-overlay id="qr_panl" :show="show" @click="show = false">
+    </van-overlay>
     <div id="menu">
       <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
         <van-list v-model="isLoading" :finished="isFinished" @load="onLoad" style="margin-top: 5px;">
-          <van-row type="flex" justify="space-between" v-for="(item, index) in sites" class="item_class" :key="index">
+          <van-row type="flex" justify="space-between" v-for="(item, index) in sites" class="item_class" :key="item.id">
             <van-col span="4">
               <div class="item_index">{{index + 1}}</div>
             </van-col>
             <van-col span="12" align="left" style="line-height: 45px;">{{item.name}}</van-col>
             <van-col span="4" style="line-height: 45px;">{{item.likes}}</van-col>
             <van-col v-if="item.islike === 'like'" span="4">
-              <van-image class="item_img" src="/static/img/recommend.png" @click="addLike(index, item.likes)"></van-image>
+              <van-image class="item_img" src="/static/img/recommend.png"
+                         @click="addLike(index, item.likes)"></van-image>
             </van-col>
             <van-col v-else span="4">
-              <van-image class="item_img" src="/static/img/unrecommend.png" @click="addLike(index, item.likes)"></van-image>
+              <van-image class="item_img" src="/static/img/unrecommend.png"
+                         @click="addLike(index, item.likes)"></van-image>
             </van-col>
           </van-row>
         </van-list>
@@ -22,7 +26,7 @@
     <div id="share" @click="share">
       <b>分 享 有 礼 ></b>
     </div>
-    <div id="company">青岛禹锡智慧科技有限公司 技术支持</div>
+        <div id="company">青岛禹锡智慧科技有限公司 技术支持</div>
   </div>
 </template>
 
@@ -30,11 +34,13 @@
 import $ from 'jquery'
 import {
   Button, Icon, PullRefresh, List,
-  Cell, Row, Col, Image, Toast
+  Cell, Row, Col, Image, Toast, Overlay,
+  Popup
 } from 'vant'
 import utils from '../assets/script/utils'
 import config from '../assets/script/config'
 import Axios from 'axios'
+import QRCode from 'qrcodejs2'
 
 export default {
   name: 'App',
@@ -47,7 +53,9 @@ export default {
     [Row.name]: Row,
     [Col.name]: Col,
     [Image.name]: Image,
-    [Toast.name]: Toast
+    [Toast.name]: Toast,
+    [Overlay.name]: Overlay,
+    [Popup.name]: Popup
   },
   data () {
     return {
@@ -57,7 +65,9 @@ export default {
       bgstyle: {
         backgroundSize: $(document).width() + ' ' + $(document).height()
       },
-      sites: []
+      sites: [],
+      show: false,
+      shareUrl: location.href
     }
   },
   mounted () {
@@ -69,21 +79,34 @@ export default {
   },
   methods: {
     share () {
-      Toast.success('请点击浏览器右上角选择分享')
+      // Toast.success('请点击浏览器右上角选择分享')
+      $('#qr_panl').html('<div id="qrcode"></div>')
+      // eslint-disable-next-line no-new
+      new QRCode('qrcode', {
+        width: 200,
+        height: 200,
+        text: this.shareUrl,
+        render: 'canvas',
+        background: '#f0f',
+        foreground: '#ff0'
+      })
+      this.show = true
+      console.log(this.shareUrl)
     },
     addLike (index, num) {
       this.$set(this.sites[index], 'likes', parseInt(num) + 1)
       this.sites.sort(function (a, b) {
-        let x = a['likes']
-        let y = b['likes']
-        return ((x < y) ? ((x > y) ? 1 : 0) : -1)
+        let x = parseInt(a['likes'])
+        let y = parseInt(b['likes'])
+        return y - x
       })
-      console.log(JSON.stringify(this.sites[0]))
-      this.$set(this.sites[0], 'islike', 'like')
-      this.$set(this.sites[1], 'islike', 'like')
-      this.$set(this.sites[2], 'islike', 'like')
-      for (let i = 3; i < this.sites.length; i++) {
-        this.$set(this.sites[i], 'islike', 'like-o')
+      console.log(JSON.stringify(this.sites))
+      for (let i = 0; i < this.sites.length; i++) {
+        if (i === 0 || i === 1 || i === 2) {
+          this.$set(this.sites[i], 'islike', 'like')
+        } else {
+          this.$set(this.sites[i], 'islike', 'like-o')
+        }
       }
     },
     onLoad () {
@@ -92,42 +115,49 @@ export default {
       this.isFinished = true
       this.isLoading = false
       let defaultMenus = [{
+        id: 1,
         img: '/static/img/recommend.png',
         name: '红烧茄子',
         description: '这里是菜品介绍',
         likes: 9999,
         islike: 'like'
       }, {
+        id: 2,
         img: '/static/img/unrecommend.png',
         name: '韭菜鸡蛋',
         description: '这里是菜品介绍',
         likes: 9999,
         islike: 'like'
       }, {
+        id: 3,
         img: '/static/img/unrecommend.png',
         name: '红烧肉',
         description: '这里是菜品介绍',
         likes: 9999,
         islike: 'like'
       }, {
+        id: 4,
         img: '/static/img/unrecommend.png',
         name: '东坡肘子',
         description: '这里是菜品介绍',
         likes: 9999,
         islike: 'like-o'
       }, {
+        id: 5,
         img: '/static/img/unrecommend.png',
         name: '蚂蚁上树',
         description: '这里是菜品介绍',
         likes: '9999',
         islike: 'like-o'
       }, {
+        id: 6,
         img: '/static/img/unrecommend.png',
         name: '地三鲜',
         description: '这里是菜品介绍',
         likes: '9999',
         islike: 'like-o'
       }, {
+        id: 7,
         img: '/static/img/unrecommend.png',
         name: '尖椒豆皮',
         description: '这里是菜品介绍',
@@ -212,6 +242,15 @@ export default {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+  }
+
+  #qrcode {
+    margin-top: 180px;
+  }
+
+  #qrcode img {
+    background-color: #fff;
+    padding: 6px;
   }
 
   #company {
